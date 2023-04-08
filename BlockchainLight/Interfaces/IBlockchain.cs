@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
-using BlockchainLight.Entities.Interfaces;
+using BlockchainLight.Entities;
 
 namespace BlockchainLight.Interfaces;
 
 public interface IBlockchain
 {
-    public void InitializeChain();
-    
     public void InitializeGenesis();
 
-    public void AddGenesis(IBlock block);
+    public Block GetGenesis();
 
-    public IBlock Mine();
+    public void AddGenesis(Block block);
+
+    public Block Mine();
     
-    public void AddBlock(IBlock block);
+    public void AddBlock(Block block);
 
-    public IReadOnlyCollection<IBlock> GetBlocks();
+    public IReadOnlyCollection<Block> GetBlocks();
 }
