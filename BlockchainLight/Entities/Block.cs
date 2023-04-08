@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
-using BlockchainLight.Entities.Interfaces;
 using BlockchainLight.Helpers;
 
 namespace BlockchainLight.Entities;
 
-public class Block: IBlock
+public class Block
 {
     private const int DefaultDataLength = 256;
     

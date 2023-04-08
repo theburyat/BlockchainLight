@@ -1,80 +1,77 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using BlockchainLight.Entities;
-using BlockchainLight.Entities.Interfaces;
 using BlockchainLight.Interfaces;
 
 namespace BlockchainLight.Services;
 
 public class Blockchain: IBlockchain
 {
-    private const string RequiredHashEnding = "0000=";
-    
-    private List<IBlock> _chain;
+    private const string HashEndRestriction = "0000=";
 
-    public void InitializeChain()
+    private readonly IBlockRepository _repository;
+    private readonly IBlockFactory _factory;
+
+    public Blockchain(IBlockRepository repository, IBlockFactory factory)
     {
-        _chain = new List<IBlock>();
+        _repository = repository;
+        _factory = factory;
     }
-
+    
     public void InitializeGenesis()
     {
-        var genesis = new Block(0, null);
-        CompleteBlockGeneration(genesis);
-        
-        _chain.Add(genesis);
+        var genesis = _factory.CreateBlock(0, null, HashEndRestriction);
+        _repository.AddGenesis(genesis);
     }
 
-    public void AddGenesis(IBlock block)
+    public Block GetGenesis()
     {
-        if (_chain.Count > 0)
+        return _repository.GetBlocksCount() == 0 ? null : _repository.GetGenesis();
+    }
+
+    public void AddGenesis(Block block)
+    {
+        if (_repository.GetBlocksCount() > 0)
         {
-            _chain.Clear();
+            _repository.Clear();
         }
 
-        _chain.Add(block);
+        _repository.AddBlock(block);
     }
 
-    public IBlock Mine()
+    public Block Mine()
     {
-        var previousBlock = _chain[^1];
-        IBlock block = new Block(previousBlock.Index + 1, previousBlock.Hash);
-        CompleteBlockGeneration(block);
+        var previousBlock = _repository.GetLastBlock();
+        var block = _factory.CreateBlock(previousBlock.Index + 1, previousBlock.Hash, HashEndRestriction);
 
         return block;
     }
 
-    public void AddBlock(IBlock block)
+    public void AddBlock(Block block)
     {
         if (!IsBlockValid(block) || !IsBlockBetterThanTween(block))
         {
             return;
         }
         
-        if (block.Index >= _chain.Count)
+        if (block.Index >= _repository.GetBlocksCount())
         {
-            _chain.Add(block);
+            _repository.AddBlock(block);
         }
         else
         {
-            _chain[block.Index] = block;
+            _repository.ReplaceBlock(block.Index, block);
         }
     }
     
-    private void CompleteBlockGeneration(IBlock block)
+    public IReadOnlyCollection<Block> GetBlocks()
     {
-        while (!block.Hash.EndsWith(RequiredHashEnding))
-        {
-            block.ChangeNonce();
-            block.Hash = block.CalculateHash();
-        }
-        block.TimeStamp = DateTime.Now;
+        return _repository.GetBlocks();
     }
 
-    private bool IsBlockBetterThanTween(IBlock block)
+    private bool IsBlockBetterThanTween(Block block)
     {
-        var twin = _chain.FirstOrDefault(x => x.Index == block.Index);
+        var twin = _repository.GetBlocks().FirstOrDefault(x => x.Index == block.Index);
         if (twin is null)
         {
             return true;
@@ -83,17 +80,17 @@ public class Blockchain: IBlockchain
         return block.TimeStamp < twin.TimeStamp;
     }
 
-    private bool IsBlockValid(IBlock block)
+    private bool IsBlockValid(Block block)
     {
-        var previousBlock = _chain[block.Index - 1];
+        if (block.Index > _repository.GetBlocksCount())
+        {
+            return false;
+        }
+
+        var previousBlock = _repository.GetBlock(block.Index - 1);
 
         return block.Hash == block.CalculateHash() && 
-               block.Hash.EndsWith(RequiredHashEnding) && 
+               block.Hash.EndsWith(HashEndRestriction) && 
                block.PreviousHash == previousBlock.Hash;
-    }
-    
-    public IReadOnlyCollection<IBlock> GetBlocks()
-    {
-        return _chain;
     }
 }

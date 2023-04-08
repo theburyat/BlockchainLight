@@ -1,30 +1,21 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using BlockchainLight.Interfaces;
 using BlockchainLight.Services;
 
-namespace BlockchainLight
+namespace BlockchainLight;
+
+class Program
 {
-    class Program
+    static async Task Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            IBlockchain blockChain = new Blockchain();
-            blockChain.InitializeChain();
-            blockChain.InitializeGenesis();
+        ConsoleArguments.Port = int.Parse(args[0]);
 
-            var next = blockChain.Mine();
-            blockChain.AddBlock(next);
-            
-            next = blockChain.Mine();
-            blockChain.AddBlock(next);
-            
-            next = blockChain.Mine();
-            blockChain.AddBlock(next);
+        ConsoleArguments.NeedToMakeGenesis = bool.Parse(args[1]);
 
-            foreach (var block in blockChain.GetBlocks())
-            {
-                Console.WriteLine($"{block.PreviousHash}    {block.Hash}");
-            }
-        }
+        ConsoleArguments.Port2 = int.Parse(args[2]);
+        //ConsoleArguments.Port3 = int.Parse(args[3]);
+
+        IP2PServer server = new P2PServer();
+        await server.Start(ConsoleArguments.NeedToMakeGenesis);
     }
 }
