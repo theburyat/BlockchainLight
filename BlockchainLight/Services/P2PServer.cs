@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using BlockchainLight.CommandLine;
 using BlockchainLight.Entities;
 using BlockchainLight.Interfaces;
 using WebSocketSharp;
@@ -19,20 +20,20 @@ public class P2PServer: WebSocketBehavior, IP2PServer
 
     public P2PServer()
     {
-        _webSocketServer = new WebSocketServer($"ws://127.0.0.1:{ConsoleArguments.Port}");
+        _webSocketServer = new WebSocketServer($"ws://127.0.0.1:{CmdContext.Port}");
         _webSocketServer.AddWebSocketService<P2PServer>("/blockchain");
-        _webSocketClient = new P2PClient(new[] {ConsoleArguments.Port2/*, ConsoleArguments.Port3*/ });
+        _webSocketClient = new P2PClient(new [] { CmdContext.NodePort2, CmdContext.NodePort3 });
         _blockchain = new Blockchain(new StaticBlockRepository(), new BlockFactory());
         _ctSource = new CancellationTokenSource();
     }
     
-    public async Task Start(bool needToCreateGenesis = false)
+    public async Task StartAsync()
     {
         _webSocketServer.Start();
 
         Console.WriteLine($"Started on {_webSocketServer.Address}:{_webSocketServer.Port}");
         
-        if (needToCreateGenesis)
+        if (CmdContext.NeedToCreateGenesis)
         {
             _blockchain.InitializeGenesis();
 
@@ -60,7 +61,7 @@ public class P2PServer: WebSocketBehavior, IP2PServer
 
         Console.WriteLine($"Receive block with hash: {block.Hash} index: {block.Index} time: {block.TimeStamp}");
 
-        if (block.Index > _blockchain.GetBlocks().Count)
+        if (block.Index >= _blockchain.GetBlocks().Count)
         {
             _ctSource.Cancel();
             _ctSource = new CancellationTokenSource();
@@ -81,7 +82,7 @@ public class P2PServer: WebSocketBehavior, IP2PServer
     {
         Task.Run(async () =>
         {
-            while (_webSocketServer.IsListening)
+            while (true)
             {
                 await Task.Run(() =>
                 {
@@ -92,6 +93,7 @@ public class P2PServer: WebSocketBehavior, IP2PServer
                     Console.WriteLine($"Mine block with hash: {newBlock.Hash} index: {newBlock.Index} time: {newBlock.TimeStamp}");
                 }, _ctSource.Token);
             }
+            // ReSharper disable once FunctionNeverReturns
         });
     }
 }

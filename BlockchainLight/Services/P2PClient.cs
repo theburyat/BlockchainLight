@@ -30,7 +30,10 @@ public class P2PClient: IP2PClient
                 node.Value.Connect();
             }
 
-            node.Value.Send(data);
+            if (node.Value.Ping())
+            {
+                node.Value.Send(data);
+            }
         }
     }
 }
