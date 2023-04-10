@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BlockchainLight.Entities;
 using BlockchainLight.Interfaces;
 
@@ -7,20 +9,20 @@ namespace BlockchainLight.Services;
 
 public class Blockchain: IBlockchain
 {
-    private const string HashEndRestriction = "0000=";
-
     private readonly IBlockRepository _repository;
     private readonly IBlockFactory _factory;
+    private readonly IBlockValidator _validator;
 
-    public Blockchain(IBlockRepository repository, IBlockFactory factory)
+    public Blockchain(IBlockRepository repository, IBlockFactory factory, IBlockValidator validator)
     {
         _repository = repository;
         _factory = factory;
+        _validator = validator;
     }
     
-    public void InitializeGenesis()
+    public async Task InitializeGenesisAsync(CancellationToken cancellationToken)
     {
-        var genesis = _factory.CreateBlock(0, null, HashEndRestriction);
+        var genesis = await _factory.CreateBlockAsync(0, null, AppConstants.HashEndRestriction, cancellationToken);
         _repository.AddGenesis(genesis);
     }
 
@@ -39,10 +41,14 @@ public class Blockchain: IBlockchain
         _repository.AddBlock(block);
     }
 
-    public Block Mine()
+    public async Task<Block> MineAsync(CancellationToken cancellationToken)
     {
         var previousBlock = _repository.GetLastBlock();
-        var block = _factory.CreateBlock(previousBlock.Index + 1, previousBlock.Hash, HashEndRestriction);
+        var block = await _factory.CreateBlockAsync(
+            previousBlock.Index + 1, 
+            previousBlock.Hash, 
+            AppConstants.HashEndRestriction,
+            cancellationToken);
 
         return block;
     }
@@ -71,13 +77,13 @@ public class Blockchain: IBlockchain
 
     private bool IsBlockBetterThanTween(Block block)
     {
-        var twin = _repository.GetBlocks().FirstOrDefault(x => x.Index == block.Index);
-        if (twin is null)
+        var tween = _repository.GetBlocks().FirstOrDefault(x => x.Index == block.Index);
+        if (tween is null)
         {
             return true;
         }
 
-        return block.TimeStamp < twin.TimeStamp;
+        return _validator.IsBlockBetterThanTween(block, tween);
     }
 
     private bool IsBlockValid(Block block)
@@ -89,8 +95,6 @@ public class Blockchain: IBlockchain
 
         var previousBlock = _repository.GetBlock(block.Index - 1);
 
-        return block.Hash == block.CalculateHash() && 
-               block.Hash.EndsWith(HashEndRestriction) && 
-               block.PreviousHash == previousBlock.Hash;
+        return _validator.IsBlockValid(block, previousBlock);
     }
 }

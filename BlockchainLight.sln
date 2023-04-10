@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlockchainLight", "BlockchainLight\BlockchainLight.csproj", "{9B29D17F-B6F4-4E2D-8C69-12B37079C7AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlockchainLightTests", "BlockchainLightTests\BlockchainLightTests.csproj", "{74005929-8B95-448B-84D0-C4F10CB11ED2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{9B29D17F-B6F4-4E2D-8C69-12B37079C7AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B29D17F-B6F4-4E2D-8C69-12B37079C7AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B29D17F-B6F4-4E2D-8C69-12B37079C7AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74005929-8B95-448B-84D0-C4F10CB11ED2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74005929-8B95-448B-84D0-C4F10CB11ED2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74005929-8B95-448B-84D0-C4F10CB11ED2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74005929-8B95-448B-84D0-C4F10CB11ED2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

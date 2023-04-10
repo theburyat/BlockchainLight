@@ -1,5 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using BlockchainLight.Entities.Enums;
+using BlockchainLight.Exceptions;
 using BlockchainLight.Interfaces;
 using WebSocketSharp;
 
@@ -33,7 +34,7 @@ public class P2PClient: IP2PClient
 
             if (!node.Value.Ping())
             {
-                throw new Exception($"can not connect to {node.Value.Url}");
+                throw new BlockchainException(ErrorCode.CanNotConnectToServer, $"Invalid url: {node.Value.Url}");
             }
 
             node.Value.Send(data);

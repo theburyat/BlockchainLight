@@ -1,17 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using BlockchainLight.Entities;
 
 namespace BlockchainLight.Interfaces;
 
 public interface IBlockchain
 {
-    public void InitializeGenesis();
+    public Task InitializeGenesisAsync(CancellationToken cancellationToken);
 
     public Block GetGenesis();
 
     public void AddGenesis(Block block);
 
-    public Block Mine();
+    public Task<Block> MineAsync(CancellationToken cancellationToken);
     
     public void AddBlock(Block block);
 

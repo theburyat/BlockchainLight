@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using BlockchainLight.Entities;
+using BlockchainLight.Entities.Enums;
+using BlockchainLight.Exceptions;
 using BlockchainLight.Interfaces;
 
 namespace BlockchainLight.Services;
@@ -8,14 +10,16 @@ public class StaticBlockRepository: IBlockRepository
 {
     public Block GetGenesis()
     {
-        return BlockStorage.Blocks.Count == 0 ? null : BlockStorage.Blocks[0];
+        return BlockStorage.Blocks.Count == 0 
+            ? throw new BlockchainException(ErrorCode.NoGenesis)
+            : BlockStorage.Blocks[0];
     }
 
     public void AddGenesis(Block genesis)
     {
         if (BlockStorage.Blocks.Count > 0)
         {
-            BlockStorage.Blocks.Clear();
+            throw new BlockchainException(ErrorCode.AlreadyHasGenesis);
         }
         
         BlockStorage.Blocks.Add(genesis);
@@ -23,14 +27,16 @@ public class StaticBlockRepository: IBlockRepository
 
     public Block GetBlock(int index)
     {
-        return BlockStorage.Blocks.Count <= index ? null : BlockStorage.Blocks[index];
+        return BlockStorage.Blocks.Count <= index 
+            ? throw new BlockchainException(ErrorCode.NoBlock)
+            : BlockStorage.Blocks[index];
     }
 
     public void AddBlock(Block block)
     {
         if (block.Index != GetBlocksCount())
         {
-            return; // TODO() throw exception
+            throw new BlockchainException(ErrorCode.InvalidIndex);
         }
         
         BlockStorage.Blocks.Add(block);
@@ -40,7 +46,7 @@ public class StaticBlockRepository: IBlockRepository
     {
         if (index >= GetBlocksCount())
         {
-            return; // TODO() throw exception
+            throw new BlockchainException(ErrorCode.InvalidIndex);
         }
         
         BlockStorage.Blocks.Insert(index, block);
@@ -48,7 +54,9 @@ public class StaticBlockRepository: IBlockRepository
 
     public Block GetLastBlock()
     {
-        return BlockStorage.Blocks.Count == 0 ? null : BlockStorage.Blocks[^1];
+        return BlockStorage.Blocks.Count == 0 
+            ? throw new BlockchainException(ErrorCode.NoBlock) 
+            : BlockStorage.Blocks[^1];
     }
 
     public IReadOnlyCollection<Block> GetBlocks()
