@@ -1,10 +1,6 @@
 ﻿FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
 WORKDIR /app
 
-EXPOSE 6001
-EXPOSE 6002
-EXPOSE 6003
-
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["BlockchainLight/BlockchainLight.csproj", "BlockchainLight/"]
