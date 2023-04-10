@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BlockchainLight.Interfaces;
 using WebSocketSharp;
 
@@ -30,10 +31,12 @@ public class P2PClient: IP2PClient
                 node.Value.Connect();
             }
 
-            if (node.Value.Ping())
+            if (!node.Value.Ping())
             {
-                node.Value.Send(data);
+                throw new Exception($"can not connect to {node.Value.Url}");
             }
+
+            node.Value.Send(data);
         }
     }
 }

@@ -43,6 +43,10 @@ public class P2PServer: WebSocketBehavior, IP2PServer
 
             RunMiningProcess();
         }
+        else
+        {
+            Console.WriteLine("Waiting for genesis");
+        }
 
         while (_webSocketServer.IsListening)
         {

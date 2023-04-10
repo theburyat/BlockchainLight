@@ -1,0 +1,48 @@
+﻿version: '3.8'
+
+services:
+  node3:
+    build:
+      context: ../
+      dockerfile: BlockchainLight/Dockerfile
+    container_name: node3
+    network_mode: "host"
+    command:
+      - '--port'
+      - '6003'
+      - '--node2-port'
+      - '6001'
+      - '--node3-port'
+      - '6002'
+      - '--need-to-create-genesis'
+      - 'false'
+  node2:
+    build:
+      context: ../
+      dockerfile: BlockchainLight/Dockerfile
+    container_name: node2
+    network_mode: "host"
+    command:
+      - '--port'
+      - '6002'
+      - '--node2-port'
+      - '6001'
+      - '--node3-port'
+      - '6003'
+      - '--need-to-create-genesis'
+      - 'false'
+  node1:
+    build:
+      context: ../
+      dockerfile: BlockchainLight/Dockerfile
+    container_name: node1
+    network_mode: "host"
+    command:
+      - '--port'
+      - '6001'
+      - '--node2-port'
+      - '6002'
+      - '--node3-port'
+      - '6003'
+      - '--need-to-create-genesis'
+      - 'true'
