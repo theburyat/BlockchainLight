@@ -25,11 +25,6 @@ public class BlockValidator: IBlockValidator
 
     private void ValidateBlock(Block block, Block previousBlock, string hashEndRestricting)
     {
-        if (block is null || previousBlock is null)
-        {
-            throw new BlockchainException(ErrorCode.InvalidBlock);
-        }
-
         if (block.Hash != block.CalculateHash() || !block.Hash.EndsWith(hashEndRestricting))
         {
             throw new BlockchainException(ErrorCode.InvalidHash);

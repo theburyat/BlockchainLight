@@ -72,7 +72,7 @@ public class Blockchain: IBlockchain
     
     private bool IsBlockValid(Block block)
     {
-        if (block.Index > _repository.GetBlocksCount())
+        if (block is null || block.Index > _repository.GetBlocksCount())
         {
             return false;
         }

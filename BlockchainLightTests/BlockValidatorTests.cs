@@ -27,34 +27,6 @@ public class BlockValidatorTests
     }
     
     [Theory]
-    [InlineData(null, "0=")]
-    public async Task IsBlockValid_NullBlock_ShouldNotBeOkAsync(Block block, string hashEndRestricting)
-    {
-        // arrange
-        var parent = await _factory.CreateBlockAsync(0, null, hashEndRestricting, CancellationToken.None);
-        
-        // act
-        var result = _validator.IsBlockValid(block, parent, hashEndRestricting);
-
-        // assert
-        result.Should().BeFalse();
-    }
-    
-    [Theory]
-    [InlineData(null, "0=")]
-    public async Task IsBlockValid_NullParent_ShouldNotBeOkAsync(Block parent, string hashEndRestricting)
-    {
-        // arrange
-        var block = await _factory.CreateBlockAsync(7, "zxczxczxc0=", hashEndRestricting, CancellationToken.None);
-        
-        // act
-        var result = _validator.IsBlockValid(block, parent, hashEndRestricting);
-
-        // assert
-        result.Should().BeFalse();
-    }
-    
-    [Theory]
     [InlineData("0=")]
     public async Task IsBlockValid_InvalidHash_ShouldNotBeOkAsync(string hashEndRestricting)
     {
@@ -81,6 +53,23 @@ public class BlockValidatorTests
         
         parent.Nonce += 1;
         parent.Hash = parent.CalculateHash();
+
+        // act
+        var result = _validator.IsBlockValid(block, parent, hashEndRestricting);
+
+        // assert
+        result.Should().BeFalse();
+    }
+    
+    [Theory]
+    [InlineData("0=")]
+    public async Task IsBlockValid_InvalidData_ShouldNotBeOkAsync(string hashEndRestricting)
+    {
+        // arrange
+        var parent = await _factory.CreateBlockAsync(0, null, hashEndRestricting, CancellationToken.None);
+        var block = await _factory.CreateBlockAsync(parent.Index, parent.Hash, hashEndRestricting, CancellationToken.None);
+
+        block.Data = "zxczxczxc";
 
         // act
         var result = _validator.IsBlockValid(block, parent, hashEndRestricting);
