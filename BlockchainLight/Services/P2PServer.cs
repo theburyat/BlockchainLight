@@ -23,7 +23,7 @@ public class P2PServer: WebSocketBehavior, IP2PServer
         _webSocketServer = new WebSocketServer($"ws://127.0.0.1:{CmdContext.Port}");
         _webSocketServer.AddWebSocketService<P2PServer>("/blockchain");
         _webSocketClient = new P2PClient(new [] { CmdContext.NodePort2, CmdContext.NodePort3 });
-        _blockchain = new Blockchain(new StaticBlockRepository(), new BlockFactory());
+        _blockchain = new Blockchain(new BlockRepository(), new BlockFactory(), new BlockValidator());
         _ctSource = new CancellationTokenSource();
     }
     
@@ -35,7 +35,7 @@ public class P2PServer: WebSocketBehavior, IP2PServer
         
         if (CmdContext.NeedToCreateGenesis)
         {
-            _blockchain.InitializeGenesis();
+            await _blockchain.InitializeGenesisAsync(_ctSource.Token);
 
             var genesis = _blockchain.GetGenesis();
             Console.WriteLine($"Genesis block with hash: {genesis.Hash} index: {genesis.Index} time: {genesis.TimeStamp}");
@@ -88,12 +88,12 @@ public class P2PServer: WebSocketBehavior, IP2PServer
         {
             while (true)
             {
-                await Task.Run(() =>
+                await Task.Run(async () =>
                 {
-                    var newBlock = _blockchain.Mine();
+                    var newBlock = await _blockchain.MineAsync(_ctSource.Token);
                     _blockchain.AddBlock(newBlock);
                     _webSocketClient.BroadcastSend(JsonSerializer.Serialize(newBlock));
-            
+
                     Console.WriteLine($"Mine block with hash: {newBlock.Hash} index: {newBlock.Index} time: {newBlock.TimeStamp}");
                 }, _ctSource.Token);
             }
