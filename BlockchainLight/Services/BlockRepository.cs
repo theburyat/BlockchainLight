@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BlockchainLight.Entities;
 using BlockchainLight.Entities.Enums;
 using BlockchainLight.Exceptions;
@@ -39,6 +40,7 @@ public class BlockRepository: IBlockRepository
             throw new BlockchainException(ErrorCode.InvalidIndex);
         }
         
+        Console.WriteLine($"Add block with hash: {block.Hash} index: {block.Index} time: {block.TimeStamp}");
         BlockStorage.Blocks.Add(block);
     }
 
