@@ -6,9 +6,12 @@ public enum ErrorCode
     AlreadyHasGenesis,
     CanNotConnectToServer,
     InvalidBlock,
+    InvalidData,
     InvalidHash,
+    InvalidHashEndRestriction,
     InvalidIndex,
     InvalidParentHash,
+    InvalidTimestamp,
     NoBlock,
     NoGenesis
 }

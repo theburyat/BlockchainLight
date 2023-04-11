@@ -23,7 +23,7 @@ public class P2PServer: WebSocketBehavior, IP2PServer
         _webSocketServer = new WebSocketServer($"ws://127.0.0.1:{CmdContext.Port}");
         _webSocketServer.AddWebSocketService<P2PServer>("/blockchain");
         _webSocketClient = new P2PClient(new [] { CmdContext.NodePort2, CmdContext.NodePort3 });
-        _blockchain = new Blockchain(new StaticBlockRepository(), new BlockFactory(), new BlockValidator());
+        _blockchain = new Blockchain(new BlockRepository(), new BlockFactory(), new BlockValidator());
         _ctSource = new CancellationTokenSource();
     }
     

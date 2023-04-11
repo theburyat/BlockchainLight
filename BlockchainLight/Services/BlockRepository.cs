@@ -6,7 +6,7 @@ using BlockchainLight.Interfaces;
 
 namespace BlockchainLight.Services;
 
-public class StaticBlockRepository: IBlockRepository
+public class BlockRepository: IBlockRepository
 {
     public Block GetGenesis()
     {

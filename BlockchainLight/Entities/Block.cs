@@ -7,8 +7,6 @@ namespace BlockchainLight.Entities;
 
 public class Block
 {
-    private const int DefaultDataLength = 256;
-    
     private readonly SHA256 _coder = SHA256.Create();
     
     public int Index { get; }
@@ -29,7 +27,7 @@ public class Block
         PreviousHash = previousHash;
 
         Nonce = RandomGenerator.GenerateRandomInt();
-        Data = RandomGenerator.GenerateRandomString(DefaultDataLength);
+        Data = RandomGenerator.GenerateRandomString(AppConstants.DefaultDataLength);
         Hash = CalculateHash();
     }
 

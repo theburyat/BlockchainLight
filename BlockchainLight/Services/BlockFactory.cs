@@ -16,17 +16,32 @@ public class BlockFactory: IBlockFactory
         string hashEndRestriction, 
         CancellationToken cancellationToken)
     {
-        if (index < 0)
-        {
-            throw new BlockchainException(ErrorCode.InvalidIndex);
-        }
+        ValidateBlockCreationParameters(index, previousHash, hashEndRestriction);
 
         var block = new Block(index, previousHash);
         await CompleteBlockGenerationAsync(block, hashEndRestriction, cancellationToken);
 
         return block;
     }
-    
+
+    private void ValidateBlockCreationParameters(int index, string previousHash, string hashEndRestriction)
+    {
+        if (index < 0)
+        {
+            throw new BlockchainException(ErrorCode.InvalidIndex);
+        }
+
+        if (previousHash is not null && previousHash.Trim() == string.Empty || previousHash is null && index > 0)
+        {
+            throw new BlockchainException(ErrorCode.InvalidParentHash);
+        }
+
+        if (string.IsNullOrWhiteSpace(hashEndRestriction) || !hashEndRestriction.EndsWith("="))
+        {
+            throw new BlockchainException(ErrorCode.InvalidHashEndRestriction);
+        }
+    }
+
     private async Task CompleteBlockGenerationAsync(Block block, string hashEndRestriction, CancellationToken cancellationToken)
     {
         await Task.Run(() =>

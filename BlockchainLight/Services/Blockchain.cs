@@ -28,17 +28,12 @@ public class Blockchain: IBlockchain
 
     public Block GetGenesis()
     {
-        return _repository.GetBlocksCount() == 0 ? null : _repository.GetGenesis();
+        return _repository.GetGenesis();
     }
 
     public void AddGenesis(Block block)
     {
-        if (_repository.GetBlocksCount() > 0)
-        {
-            _repository.Clear();
-        }
-
-        _repository.AddBlock(block);
+        _repository.AddGenesis(block);
     }
 
     public async Task<Block> MineAsync(CancellationToken cancellationToken)
@@ -74,6 +69,18 @@ public class Blockchain: IBlockchain
     {
         return _repository.GetBlocks();
     }
+    
+    private bool IsBlockValid(Block block)
+    {
+        if (block.Index > _repository.GetBlocksCount())
+        {
+            return false;
+        }
+
+        var previousBlock = _repository.GetBlock(block.Index - 1);
+
+        return _validator.IsBlockValid(block, previousBlock, AppConstants.HashEndRestriction);
+    }
 
     private bool IsBlockBetterThanTween(Block block)
     {
@@ -84,17 +91,5 @@ public class Blockchain: IBlockchain
         }
 
         return _validator.IsBlockBetterThanTween(block, tween);
-    }
-
-    private bool IsBlockValid(Block block)
-    {
-        if (block.Index > _repository.GetBlocksCount())
-        {
-            return false;
-        }
-
-        var previousBlock = _repository.GetBlock(block.Index - 1);
-
-        return _validator.IsBlockValid(block, previousBlock);
     }
 }

@@ -43,7 +43,7 @@ public static class Program
         catch (BlockchainException ex)
         {
             Console.WriteLine(ex.ErrorCode.ToString());
-            if (!string.IsNullOrEmpty(ex.Message))
+            if (!string.IsNullOrWhiteSpace(ex.Message))
             {
                 Console.WriteLine($"Message: {ex.Message}");
             }
