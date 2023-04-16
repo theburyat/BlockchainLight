@@ -25,13 +25,19 @@ git clone https://github.com/theburyat/BlockchainLight.git
 * Переход в директорию проекта
 
 ```
-cd <your path>/BlockchainLight/BlockchainLight
+cd <your path>/BlockchainLight
 ```
 
 * Сборка с помощью docker compose:
 
 ```
 docker compose build
+```
+
+или
+
+```
+docker build -t theburyat/blockchain .
 ```
 
 * Запуск с помощью docker compose:
