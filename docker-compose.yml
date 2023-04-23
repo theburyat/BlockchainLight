@@ -2,9 +2,7 @@
 
 services:
   node3:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: theburyat/blockchain
     container_name: node3
     network_mode: "host"
     command:
@@ -17,9 +15,7 @@ services:
       - '--need-to-create-genesis'
       - 'false'
   node2:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: theburyat/blockchain
     container_name: node2
     network_mode: "host"
     command:
@@ -32,9 +28,7 @@ services:
       - '--need-to-create-genesis'
       - 'false'
   node1:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: theburyat/blockchain
     container_name: node1
     network_mode: "host"
     command:
